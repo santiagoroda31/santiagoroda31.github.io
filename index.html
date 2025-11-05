@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portafolio – Santiago Rodríguez Ávila</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin:0;
+  font-family:'Inter',sans-serif;
+  background:#fafafa;
+  color:#222;
+}
+.container {
+  max-width:1000px;
+  margin:auto;
+  padding:40px 20px;
+}
+h1 {
+  font-size:40px;
+  font-weight:800;
+  margin-bottom:4px;
+}
+.subtitle {
+  font-size:20px;
+  opacity:0.6;
+  margin-bottom:30px;
+}
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:16px;
+}
+.card {
+  background:#fff;
+  border:1px solid #eee;
+  padding:18px;
+  border-radius:10px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.06);
+}
+.card h3 {
+  font-size:18px;
+  margin-bottom:10px;
+}
+.card a {
+  display:inline-block;
+  margin-top:8px;
+  background:#c41230;
+  color:white;
+  padding:8px 14px;
+  border-radius:6px;
+  text-decoration:none;
+  font-weight:bold;
+}
+.card a:hover {
+  background:#9d0f26;
+}
+.loader {
+  text-align:center;
+  margin-top:40px;
+  font-size:18px;
+  font-weight:600;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <h1>Portafolio Periodístico</h1>
+  <div class="subtitle">por Santiago Rodríguez Ávila</div>
+
+  <p>
+  Aquí encontrarás mis más de 500 artículos publicados sobre deportes, actualidad, economía y temas globales.
+  Todas las notas han sido verificadas desde sus fuentes originales.
+  </p>
+
+  <div id="articles" class="grid"></div>
+  <div id="loader" class="loader">Cargando artículos...</div>
+</div>
+
+<script>
+fetch("notas_santiago.json")
+  .then(r => r.json())
+  .then(data => {
+    document.getElementById("loader").style.display = "none";
+    let html = "";
+    data.forEach(item => {
+      html += `
+      <div class="card">
+        <h3>${item.title}</h3>
+        <a href="${item.url}" target="_blank">Leer artículo</a>
+      </div>
+      `;
+    });
+    document.getElementById("articles").innerHTML = html;
+  })
+  .catch(err => {
+    document.getElementById("loader").innerText = "Error cargando artículos";
+    console.error(err);
+  });
+</script>
+</body>
+</html>

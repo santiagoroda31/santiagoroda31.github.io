@@ -1,4 +1,4 @@
-name: Translate Titles
+name: Translate Titles and Publish
 
 on:
   push:
@@ -8,6 +8,8 @@ on:
 jobs:
   translate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 🔑 Permite hacer commit y push al repo
 
     steps:
       - name: Checkout repository
@@ -21,29 +23,20 @@ jobs:
       - name: Install dependencies
         run: pip install googletrans==4.0.0-rc1
 
-      - name: Translate Spanish titles to English
+      - name: Translate titles
         run: |
           import re
           from googletrans import Translator
 
-          # Leer el JSON original
           html = open("notas_santiago.json", encoding="utf-8").read()
-
-          # Detectar los títulos
           titles = re.findall(r'"title":\\s*"([^"]+)"', html)
-
-          # Traducir cada título (literalmente)
           translator = Translator()
           translated = [translator.translate(t, src='es', dest='en').text for t in titles]
-
-          # Reemplazar los títulos traducidos
           for old, new in zip(titles, translated):
               html = html.replace(f'"title": "{old}"', f'"title": "{new}"')
-
-          # Guardar el nuevo archivo traducido
           open("notas_santiago.json", "w", encoding="utf-8").write(html)
 
-      - name: Commit translated JSON back to repo
+      - name: Commit and push translated file
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"

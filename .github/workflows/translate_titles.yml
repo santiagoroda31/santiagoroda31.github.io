@@ -19,8 +19,7 @@ jobs:
           python-version: "3.10"
 
       - name: Install dependencies
-        run: |
-          pip install googletrans==4.0.0-rc1
+        run: pip install googletrans==4.0.0-rc1
 
       - name: Translate Spanish titles to English
         run: |
@@ -37,15 +36,17 @@ jobs:
           translator = Translator()
           translated = [translator.translate(t, src='es', dest='en').text for t in titles]
 
-          # Reemplazar los títulos traducidos en el texto original
+          # Reemplazar los títulos traducidos
           for old, new in zip(titles, translated):
               html = html.replace(f'"title": "{old}"', f'"title": "{new}"')
 
           # Guardar el nuevo archivo traducido
-          open("notas_santiago_translated.json", "w", encoding="utf-8").write(html)
+          open("notas_santiago.json", "w", encoding="utf-8").write(html)
 
-      - name: Upload translated file as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: translated_json
-          path: notas_santiago_translated.json
+      - name: Commit translated JSON back to repo
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add notas_santiago.json
+          git commit -m "auto-translate titles to English"
+          git push

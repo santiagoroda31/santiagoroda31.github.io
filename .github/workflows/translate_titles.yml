@@ -1,0 +1,51 @@
+name: Translate Titles
+
+on:
+  push:
+    paths:
+      - "notas_santiago.json"
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          pip install googletrans==4.0.0-rc1
+
+      - name: Translate Spanish titles to English
+        run: |
+          import re
+          from googletrans import Translator
+
+          # Leer el JSON original
+          html = open("notas_santiago.json", encoding="utf-8").read()
+
+          # Detectar los títulos
+          titles = re.findall(r'"title":\\s*"([^"]+)"', html)
+
+          # Traducir cada título (literalmente)
+          translator = Translator()
+          translated = [translator.translate(t, src='es', dest='en').text for t in titles]
+
+          # Reemplazar los títulos traducidos en el texto original
+          for old, new in zip(titles, translated):
+              html = html.replace(f'"title": "{old}"', f'"title": "{new}"')
+
+          # Guardar el nuevo archivo traducido
+          open("notas_santiago_translated.json", "w", encoding="utf-8").write(html)
+
+      - name: Upload translated file as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: translated_json
+          path: notas_santiago_translated.json
